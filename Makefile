@@ -1,12 +1,12 @@
 # Makefile for ChibiOS
 
-USE_OPT ?= -std=gnu99 -O2 -ggdb -fomit-frame-pointer -falign-functions=16
+USE_OPT ?= -O2 -ggdb -fomit-frame-pointer -falign-functions=16
 
 # C specific options here (added to USE_OPT).
-USE_COPT ?= 
+USE_COPT ?= -std=gnu99
 
 # C++ specific options here (added to USE_OPT).
-USE_CPPOPT ?= -fno-rtti
+USE_CPPOPT ?= -fno-rtti -fno-exceptions -std=c++11
 
 # Enable this if you want the linker to remove unused code and data
 USE_LINK_GC ?= yes
@@ -21,6 +21,9 @@ USE_LTO ?= no
 USE_THUMB ?= yes
 
 # Enable this if you want to see the full log while compiling.
+ifeq ($(V),1)
+	USE_VERBOSE_COMPILE = yes
+endif
 USE_VERBOSE_COMPILE ?= no
 
 # Enable for semihosting support. Project will not run standalone.
@@ -48,11 +51,16 @@ CSRC = $(PORTSRC) \
        $(HALSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
-       main.c
+       main.c \
+       helper.c \
+       crc16.c \
+       gps.c \
+       rtty.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CPPSRC =
+CPPSRC = TinyGPS.cpp \
+      micronut_v2.cpp
 
 # List ASM source files here
 ASMSRC = $(PORTASM)
@@ -82,7 +90,7 @@ BIN  = $(CP) -O binary
 TOPT = -mthumb -DTHUMB
 
 # Define C warning options here
-CWARN = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
+CWARN = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
 
 # Define C++ warning options here
 CPPWARN = -Wall -Wextra
